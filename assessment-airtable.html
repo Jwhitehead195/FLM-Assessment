@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLM Skills Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1B1D1E 0%, #2a2d31 100%);
+            color: #1B1D1E;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #FBFBF9;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: #1B1D1E;
+            color: #FBFBF9;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        main {
+            padding: 40px;
+            min-height: 400px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #1B1D1E;
+            font-size: 16px;
+        }
+
+        input[type="email"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ECEBE6;
+            border-radius: 6px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input[type="email"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #3A34C4;
+        }
+
+        .segment-info {
+            background: #ECEBE6;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-top: 8px;
+            color: #555;
+        }
+
+        .question-container {
+            background: #FBFBF9;
+            padding: 24px;
+            border: 2px solid #ECEBE6;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .question-number {
+            font-weight: 600;
+            color: #3A34C4;
+            font-family: monospace;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 6px;
+            background: #ECEBE6;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3A34C4;
+            transition: width 0.3s;
+        }
+
+        .question-text {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #1B1D1E;
+            line-height: 1.5;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            display: flex;
+            align-items: flex-start;
+            padding: 12px;
+            border: 2px solid #ECEBE6;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option:hover {
+            background: #ECEBE6;
+            border-color: #3A34C4;
+        }
+
+        .option input[type="radio"] {
+            margin-right: 12px;
+            margin-top: 2px;
+            cursor: pointer;
+        }
+
+        .option label {
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+            margin-top: 32px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #3A34C4;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #2e29a0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(58, 52, 196, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #ECEBE6;
+            color: #1B1D1E;
+        }
+
+        .btn-secondary:hover {
+            background: #ddd;
+        }
+
+        .results-container {
+            text-align: center;
+        }
+
+        .tier-badge {
+            display: inline-block;
+            font-size: 48px;
+            font-weight: 700;
+            font-family: monospace;
+            padding: 20px 30px;
+            margin: 20px 0;
+            border-radius: 12px;
+            color: white;
+        }
+
+        .tier-a {
+            background: #157F4B;
+        }
+
+        .tier-b {
+            background: #B47311;
+        }
+
+        .tier-c {
+            background: #B23A2E;
+        }
+
+        .score-display {
+            font-size: 28px;
+            font-weight: 600;
+            margin: 16px 0;
+            color: #1B1D1E;
+        }
+
+        .strengths-opportunities {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 24px 0;
+            text-align: left;
+        }
+
+        .strength-box, .opportunity-box {
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .strength-box {
+            background: #f0f5f0;
+            border-left: 4px solid #157F4B;
+        }
+
+        .opportunity-box {
+            background: #fef5f0;
+            border-left: 4px solid #B23A2E;
+        }
+
+        .strength-box h3, .opportunity-box h3 {
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .strength-box ul, .opportunity-box ul {
+            list-style: none;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .strength-box li:before {
+            content: "✓ ";
+            color: #157F4B;
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        .opportunity-box li:before {
+            content: "→ ";
+            color: #B23A2E;
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        .error-message {
+            background: #fef5f0;
+            border-left: 4px solid #B23A2E;
+            color: #B23A2E;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #f0f5f0;
+            border-left: 4px solid #157F4B;
+            color: #157F4B;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ECEBE6;
+            border-top-color: #3A34C4;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer {
+            background: #ECEBE6;
+            padding: 16px 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                padding: 20px;
+            }
+
+            .strengths-opportunities {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>FLM Skills Assessment</h1>
+            <p>Front-Line Manager Competency Evaluation</p>
+        </header>
+
+        <main>
+            <!-- SECTION 1: Email & Segment Selection -->
+            <div id="setup-section" class="section active">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        placeholder="you@docusign.com" 
+                        required
+                    >
+                    <div class="segment-info">
+                        Must be a valid DocuSign email (@docusign.com)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        placeholder="John Doe" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="segment">Select Your Segment</label>
+                    <select id="segment" required>
+                        <option value="">-- Choose your segment --</option>
+                        <option value="SMB">SMB Sales Manager</option>
+                        <option value="Commercial">Commercial Sales Manager (Mid-Market)</option>
+                        <option value="Enterprise">Enterprise Sales Manager</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="validateSetupAndStart()">
+                        Start Assessment
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECTION 2: Assessment Questions -->
+            <div id="assessment-section" class="section">
+                <div id="questions-container"></div>
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="goToPreviousQuestion()" id="btn-prev">
+                        ← Previous
+                    </button>
+                    <button class="btn-primary" onclick="goToNextQuestion()" id="btn-next">
+                        Next →
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECTION 3: Results -->
+            <div id="results-section" class="section">
+                <div class="results-container" id="results-content"></div>
+            </div>
+        </main>
+
+        <div class="footer">
+            © 2024 DocuSign Sales Enablement
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // AIRTABLE CONFIGURATION
+        // ============================================
+        const AIRTABLE_TOKEN = "patHjshiSIZCbUW2Z.a57b14e72c2685eeab2d54718332398cdae5e3e60141864d7c248c8ad581cca6";
+        const AIRTABLE_BASE_ID = "appyk6zmrKlF03x0X";
+        const AIRTABLE_TABLE_ID = "tbl0yeaqFNF5gAtOJ";
+
+        // ============================================
+        // ASSESSMENT QUESTIONS
+        // ============================================
+        const QUESTIONS = {
+            SMB: [
+                {
+                    id: "smb-1",
+                    text: "A rep on your team has been stuck on a deal for 3 months with no recent activity. What's your first move?",
+                    options: [
+                        { text: "Ask them to walk me through their current pipeline math and where this deal stands relative to their quota", score: 10 },
+                        { text: "Have them schedule another call with the prospect to re-engage", score: 7 },
+                        { text: "Check Salesforce to see when they last touched the deal", score: 5 },
+                        { text: "Move it to Closed Lost and move on", score: 3 },
+                        { text: "Tell them to drop it—it's not going to close", score: 0 }
+                    ]
+                },
+                {
+                    id: "smb-2",
+                    text: "You notice your team's close rate has dropped from 35% to 28% this quarter. What do you do first?",
+                    options: [
+                        { text: "Analyze which stages deals are stalling in and where reps are losing momentum", score: 10 },
+                        { text: "Tell the team they need to work harder and close more deals", score: 5 },
+                        { text: "Check if there's been a change in deal size or sales cycle", score: 7 },
+                        { text: "Assume it's a market thing and wait to see if it corrects", score: 3 },
+                        { text: "Fire the lowest performer and see if that helps", score: 0 }
+                    ]
+                },
+                {
+                    id: "smb-3",
+                    text: "Your best rep is burning out—high production but showing signs of stress. What's your approach?",
+                    options: [
+                        { text: "Pull them in for a real conversation about workload, personal goals, and how to sustain performance", score: 10 },
+                        { text: "Give them a bonus to keep them motivated", score: 7 },
+                        { text: "Have them mentor junior reps to share the load", score: 5 },
+                        { text: "Ignore it—if they're producing, they're fine", score: 3 },
+                        { text: "Move them to an easier territory", score: 0 }
+                    ]
+                },
+                {
+                    id: "smb-4",
+                    text: "A prospect asks your rep for a custom pricing proposal. Your rep comes to you. How do you handle it?",
+                    options: [
+                        { text: "Ask why the deal is worth a custom price and whether it fits your pricing model before approving", score: 10 },
+                        { text: "Approve it—don't lose the deal", score: 7 },
+                        { text: "Tell the rep to first show the standard pricing and only go custom if they push back", score: 5 },
+                        { text: "Say yes immediately without knowing the deal details", score: 3 },
+                        { text: "Tell the rep to walk away", score: 0 }
+                    ]
+                },
+                {
+                    id: "smb-5",
+                    text: "You're in a forecast call with your VP. A deal looks iffy. How do you describe it?",
+                    options: [
+                        { text: "Be honest about the risk—share what needs to happen for it to close and what the rep is doing to move it", score: 10 },
+                        { text: "Highlight it as likely but acknowledge some uncertainty", score: 7 },
+                        { text: "Call it as probable to look good", score: 5 },
+                        { text: "Promise it will close without details", score: 3 },
+                        { text: "Don't mention it at all", score: 0 }
+                    ]
+                }
+            ],
+            Commercial: [
+                {
+                    id: "comm-1",
+                    text: "You're coaching a rep on a $150K deal with multiple stakeholders. The rep has the champion but hasn't met the economic buyer. What's your guidance?",
+                    options: [
+                        { text: "Stop. Don't move until you've identified the economic buyer and understand their priorities. The deal isn't ready.", score: 10 },
+                        { text: "Have the rep ask the champion to introduce them to finance", score: 7 },
+                        { text: "Send in a sales engineer to present to tech stakeholders first", score: 5 },
+                        { text: "Tell the rep to send a proposal to the champion", score: 3 },
+                        { text: "Assume the champion can sell it internally", score: 0 }
+                    ]
+                },
+                {
+                    id: "comm-2",
+                    text: "Your team's average deal size is shrinking. What's your diagnostic approach?",
+                    options: [
+                        { text: "Pull deal data to see if reps are closing smaller deals, pursuing the wrong personas, or losing competitive battles early", score: 10 },
+                        { text: "Tell reps to focus on bigger opportunities", score: 7 },
+                        { text: "Assume the market is shifting and accept it", score: 5 },
+                        { text: "Increase targets and see what happens", score: 3 },
+                        { text: "Blame the marketing team", score: 0 }
+                    ]
+                },
+                {
+                    id: "comm-3",
+                    text: "A rep loses a $200K deal to a competitor at the last minute. What do you do?",
+                    options: [
+                        { text: "Debrief to understand: Who else did the prospect talk to? What was the gap? Were we ever really competitive? What would we do differently?", score: 10 },
+                        { text: "Offer encouragement and move on", score: 7 },
+                        { text: "Ask why they didn't discount more", score: 5 },
+                        { text: "Tell them to move on to the next deal", score: 3 },
+                        { text: "Question their capability", score: 0 }
+                    ]
+                },
+                {
+                    id: "comm-4",
+                    text: "You're coaching a rep on how to navigate a complex org chart with 6+ stakeholders. What's your first principle?",
+                    options: [
+                        { text: "Start with who controls the budget and work backward to understand influence and priorities", score: 10 },
+                        { text: "Have them talk to everyone and map relationships", score: 7 },
+                        { text: "Focus on building rapport with the loudest voice", score: 5 },
+                        { text: "Send in a solutions engineer early", score: 3 },
+                        { text: "Hope the champion handles it internally", score: 0 }
+                    ]
+                },
+                {
+                    id: "comm-5",
+                    text: "A rep says they're ready to present a proposal but hasn't confirmed the buying committee will attend. What do you do?",
+                    options: [
+                        { text: "Stop them. Confirm the economic buyer and key influencers will be in the room first. A proposal without the right people is a waste.", score: 10 },
+                        { text: "Let them present and see what happens", score: 7 },
+                        { text: "Have them send it via email instead", score: 5 },
+                        { text: "Tell them to schedule it and assume people will show", score: 3 },
+                        { text: "Push for an immediate close", score: 0 }
+                    ]
+                }
+            ],
+            Enterprise: [
+                {
+                    id: "ent-1",
+                    text: "You're working a $2M deal with 10+ stakeholders across 3 departments. Your champion is procurement. What's your risk?",
+                    options: [
+                        { text: "Procurement doesn't drive the budget—you need executive sponsorship from a C-level stakeholder, not just procurement buy-in. Escalate.", score: 10 },
+                        { text: "Procurement is perfect—they control the budget", score: 7 },
+                        { text: "Work with procurement to map other stakeholders", score: 5 },
+                        { text: "Keep moving forward with procurement as your primary contact", score: 3 },
+                        { text: "Send in your VP to close it", score: 0 }
+                    ]
+                },
+                {
+                    id: "ent-2",
+                    text: "An 18-month sales cycle just stalled at mutual close plan (MCP). No recent activity. What's your first move?",
+                    options: [
+                        { text: "Have your rep reach out to the executive sponsor to understand the delay, reconfirm commitment, and reset timeline", score: 10 },
+                        { text: "Wait—these cycles always have delays", score: 7 },
+                        { text: "Have the rep check in with their day-to-day contact", score: 5 },
+                        { text: "Assume the deal is dead", score: 3 },
+                        { text: "Lower the price to create urgency", score: 0 }
+                    ]
+                },
+                {
+                    id: "ent-3",
+                    text: "Your rep has great chemistry with 4 stakeholders but can't get a meeting with the CFO. What do you recommend?",
+                    options: [
+                        { text: "The CFO controls the budget. Escalate this to your leadership to facilitate an executive introduction. This is non-negotiable.", score: 10 },
+                        { text: "Have a champion ask the CFO for a meeting", score: 7 },
+                        { text: "Wait until later in the process", score: 5 },
+                        { text: "Proceed without CFO buy-in for now", score: 3 },
+                        { text: "Send a cold email to the CFO", score: 0 }
+                    ]
+                },
+                {
+                    id: "ent-4",
+                    text: "You're coaching someone on working a deal with a newly appointed sponsor. How do you approach sponsor validation?",
+                    options: [
+                        { text: "Verify: Does this person have budget authority? Do they want change? Are they credible with other stakeholders? Trust but verify.", score: 10 },
+                        { text: "Trust their title and move forward", score: 7 },
+                        { text: "Ask a champion if they like this person", score: 5 },
+                        { text: "Assume the title means they have authority", score: 3 },
+                        { text: "Skip sponsor validation entirely", score: 0 }
+                    ]
+                },
+                {
+                    id: "ent-5",
+                    text: "A deal is in legal review for 6 weeks with no updates. What's your escalation strategy?",
+                    options: [
+                        { text: "Have your legal team reach out to theirs to understand blockers, timeline, and what's needed to move forward", score: 10 },
+                        { text: "Have the sales rep follow up with their contact", score: 7 },
+                        { text: "Wait—legal reviews always take time", score: 5 },
+                        { text: "Assume there's a problem and deprioritize", score: 3 },
+                        { text: "Offer to reduce scope to speed it up", score: 0 }
+                    ]
+                }
+            ]
+        };
+
+        // ============================================
+        // STATE
+        // ============================================
+        let currentSegment = null;
+        let currentQuestionIndex = 0;
+        let managerEmail = null;
+        let managerName = null;
+        let answers = {};
+
+        // ============================================
+        // FUNCTIONS
+        // ============================================
+        function validateSetupAndStart() {
+            const email = document.getElementById("email").value.trim().toLowerCase();
+            const name = document.getElementById("name").value.trim();
+            const segment = document.getElementById("segment").value;
+
+            if (!email.endsWith("@docusign.com")) {
+                alert("Please enter a valid DocuSign email address (@docusign.com)");
+                return;
+            }
+
+            if (!name) {
+                alert("Please enter your full name");
+                return;
+            }
+
+            if (!segment) {
+                alert("Please select a segment");
+                return;
+            }
+
+            managerEmail = email;
+            managerName = name;
+            currentSegment = segment;
+            currentQuestionIndex = 0;
+            answers = {};
+
+            showSection("assessment-section");
+            renderQuestion();
+            updateButtonStates();
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+            document.getElementById(sectionId).classList.add("active");
+        }
+
+        function renderQuestion() {
+            const questions = QUESTIONS[currentSegment];
+            const question = questions[currentQuestionIndex];
+            
+            let html = `
+                <div class="question-container">
+                    <div class="question-header">
+                        <span class="question-number">Q${currentQuestionIndex + 1} / ${questions.length}</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${((currentQuestionIndex + 1) / questions.length) * 100}%"></div>
+                        </div>
+                    </div>
+                    <div class="question-text">${question.text}</div>
+                    <div class="options">
+            `;
+
+            question.options.forEach((option, idx) => {
+                const checked = answers[question.id] === idx ? "checked" : "";
+                html += `
+                    <label class="option">
+                        <input type="radio" name="q${currentQuestionIndex}" value="${idx}" ${checked} 
+                            onchange="answers['${question.id}'] = ${idx}">
+                        <label>${option.text}</label>
+                    </label>
+                `;
+            });
+
+            html += `</div></div>`;
+            document.getElementById("questions-container").innerHTML = html;
+        }
+
+        function goToNextQuestion() {
+            const questions = QUESTIONS[currentSegment];
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+                updateButtonStates();
+            } else {
+                submitAssessment();
+            }
+        }
+
+        function goToPreviousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+                updateButtonStates();
+            }
+        }
+
+        function updateButtonStates() {
+            const questions = QUESTIONS[currentSegment];
+            document.getElementById("btn-prev").style.display = currentQuestionIndex === 0 ? "none" : "block";
+            document.getElementById("btn-next").textContent = 
+                currentQuestionIndex === questions.length - 1 ? "Submit" : "Next →";
+        }
+
+        function calculateScore() {
+            const questions = QUESTIONS[currentSegment];
+            let totalScore = 0;
+            let totalPoints = 0;
+
+            questions.forEach(q => {
+                const answerIdx = answers[q.id];
+                if (answerIdx !== undefined) {
+                    const selectedOption = q.options[answerIdx];
+                    totalScore += selectedOption.score;
+                }
+                totalPoints += 10;
+            });
+
+            const percentage = Math.round((totalScore / totalPoints) * 100);
+            let tier = "C";
+            if (percentage >= 85) tier = "A";
+            else if (percentage >= 70) tier = "B";
+
+            return { score: totalScore, totalPoints, percentage, tier };
+        }
+
+        function submitAssessment() {
+            const results = calculateScore();
+            const strengths = getStrengths(results.tier);
+            const opportunities = getOpportunities(results.tier);
+
+            // Send to Airtable directly
+            sendToAirtable(results, strengths, opportunities);
+        }
+
+        function sendToAirtable(results, strengths, opportunities) {
+            const timestamp = new Date().toLocaleString();
+            
+            const record = {
+                fields: {
+                    "Timestamp": timestamp,
+                    "Manager Email": managerEmail,
+                    "Manager Name": managerName,
+                    "Segment": currentSegment,
+                    "Raw Score": results.score,
+                    "Total Points": results.totalPoints,
+                    "Tier": results.tier,
+                    "Strengths": strengths.join(" | "),
+                    "Opportunities": opportunities.join(" | ")
+                }
+            };
+
+            const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_ID}`;
+
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${AIRTABLE_TOKEN}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ records: [record] })
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayResults(results, strengths, opportunities);
+            })
+            .catch(error => {
+                console.error("Airtable error:", error);
+                displayResults(results, strengths, opportunities);
+            });
+        }
+
+        function displayResults(results, strengths, opportunities) {
+            const tierClass = `tier-${results.tier.toLowerCase()}`;
+
+            let html = `
+                <h2>Assessment Complete</h2>
+                <div class="tier-badge ${tierClass}">${results.tier}</div>
+                <div class="score-display">
+                    Your Score: ${results.score} / ${results.totalPoints} (${results.percentage}%)
+                </div>
+                <div class="strengths-opportunities">
+                    <div class="strength-box">
+                        <h3>Your Strengths</h3>
+                        <ul>
+                            ${strengths.map(s => `<li>${s}</li>`).join("")}
+                        </ul>
+                    </div>
+                    <div class="opportunity-box">
+                        <h3>Opportunities to Grow</h3>
+                        <ul>
+                            ${opportunities.map(o => `<li>${o}</li>`).join("")}
+                        </ul>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById("results-content").innerHTML = html;
+            showSection("results-section");
+        }
+
+        function getStrengths(tier) {
+            const strengthsMap = {
+                A: ["Pipeline discipline & forecasting", "Stakeholder orchestration", "Deal qualification", "Team coaching"],
+                B: ["Sales process execution", "Basic pipeline management", "Deal progression", "Rep support"],
+                C: ["Foundational knowledge", "Activity tracking", "Basic coaching", "Opportunity areas"]
+            };
+            return strengthsMap[tier] || [];
+        }
+
+        function getOpportunities(tier) {
+            const opportunitiesMap = {
+                A: ["Executive engagement strategy", "Multi-threaded deals", "Margin optimization"],
+                B: ["Competitive positioning", "Executive coaching", "Deal complexity management"],
+                C: ["Sales methodology", "Coaching effectiveness", "Pipeline discipline", "Discovery skills"]
+            };
+            return opportunitiesMap[tier] || [];
+        }
+    </script>
+</body>
+</html>
