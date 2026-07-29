@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FLM Skills Assessment</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -234,7 +235,86 @@
             margin-bottom: 20px;
         }
 
-        /* Results Styles */
+        /* Summary Screen Styles */
+        .summary-badge {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px auto;
+            font-size: 56px;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .summary-badge.advanced {
+            background: linear-gradient(135deg, #157F4B 0%, #0d5a38 100%);
+        }
+
+        .summary-badge.proficient {
+            background: linear-gradient(135deg, #B47311 0%, #8a5a0a 100%);
+        }
+
+        .summary-badge.developing {
+            background: linear-gradient(135deg, #B23A2E 0%, #8a2c22 100%);
+        }
+
+        .summary-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .summary-description {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            text-align: center;
+            padding: 20px;
+            background: #f9f9f7;
+            border-radius: 8px;
+        }
+
+        .key-insights {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f0f5f0;
+            border-left: 4px solid #157F4B;
+            border-radius: 8px;
+        }
+
+        .key-insights h3 {
+            color: #157F4B;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .key-insights ul {
+            margin-left: 20px;
+        }
+
+        .key-insights li {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .button-group button {
+            flex: 1;
+        }
+
+        /* Results Report Styles */
         .overall-profile {
             text-align: center;
             margin-bottom: 30px;
@@ -375,6 +455,19 @@
             margin-bottom: 6px;
         }
 
+        .score-breakdown {
+            margin-top: 20px;
+            padding: 16px;
+            background: #f9f9f7;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .score-breakdown strong {
+            color: #1B1D1E;
+        }
+
         @media (max-width: 768px) {
             .card {
                 padding: 24px;
@@ -384,8 +477,8 @@
                 grid-template-columns: 1fr;
             }
 
-            .lang-btn {
-                flex: 0 1 calc(50% - 6px);
+            .button-group {
+                flex-direction: column;
             }
         }
 
@@ -394,8 +487,39 @@
             font-size: 14px;
             margin-top: 8px;
         }
+
+        /* PDF Specific Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            .card {
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+            .nav-buttons, .button-group {
+                display: none;
+            }
+        }
+
+        .pdf-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #1B1D1E;
+        }
+
+        .pdf-header h1 {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .pdf-metadata {
+            font-size: 12px;
+            color: #666;
+            margin-top: 12px;
+        }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -424,7 +548,7 @@
                 </div>
 
                 <div class="welcome-text" id="welcomeText">
-                    This comprehensive assessment evaluates your mastery across the seven core competencies of front-line management through 21 varied scenarios that test how you think and respond to real challenges.
+                    This comprehensive assessment evaluates your mastery across the seven core competencies of front-line management through 21 carefully crafted scenarios that test how you think and respond to real challenges.
                 </div>
 
                 <button onclick="goToIntroForm()">
@@ -489,34 +613,68 @@
             </div>
         </div>
 
-        <!-- Results Screen -->
+        <!-- Summary Screen -->
+        <div id="summaryScreen" class="screen">
+            <div class="card">
+                <div class="header">
+                    <h1 id="summaryTitle">Assessment Complete</h1>
+                </div>
+
+                <div class="summary-badge" id="summaryBadge"></div>
+
+                <div class="summary-title" id="summaryProfileTitle"></div>
+                
+                <div class="summary-description" id="summaryDescription"></div>
+
+                <div class="key-insights">
+                    <h3>📊 Your Key Insights</h3>
+                    <ul id="keyInsightsList"></ul>
+                </div>
+
+                <div class="button-group">
+                    <button onclick="viewFullReport()">View Full Report →</button>
+                    <button class="secondary" onclick="downloadPDF()">📥 Download PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Report Screen -->
         <div id="resultsScreen" class="screen">
             <div class="card">
-                <div class="overall-profile">
-                    <h1 id="resultsTitle">Assessment Complete</h1>
-                    <div class="profile-level" id="profileLevel"></div>
-                    <div class="coaching-message" id="coachingMessage"></div>
-                </div>
-
-                <div class="competencies-section">
-                    <div class="section-title">Your Competencies</div>
-                    <div id="competenciesList"></div>
-                </div>
-
-                <div class="strengths-opportunities">
-                    <div class="strength-box">
-                        <h3>✓ Your Strengths</h3>
-                        <div class="box-content" id="strengthsList"></div>
+                <div id="reportContent">
+                    <div class="overall-profile">
+                        <h1 id="resultsTitle">Your FLM Skills Assessment Report</h1>
+                        <div class="profile-level" id="profileLevel"></div>
+                        <div class="coaching-message" id="coachingMessage"></div>
                     </div>
-                    <div class="opportunity-box">
-                        <h3>→ Where You Can Grow</h3>
-                        <div class="box-content" id="opportunitiesList"></div>
+
+                    <div class="competencies-section">
+                        <div class="section-title">Your Competencies</div>
+                        <div id="competenciesList"></div>
+                    </div>
+
+                    <div class="strengths-opportunities">
+                        <div class="strength-box">
+                            <h3>✓ Your Strengths</h3>
+                            <div class="box-content" id="strengthsList"></div>
+                        </div>
+                        <div class="opportunity-box">
+                            <h3>→ Where You Can Grow</h3>
+                            <div class="box-content" id="opportunitiesList"></div>
+                        </div>
+                    </div>
+
+                    <div class="score-breakdown">
+                        <strong>Assessment Results:</strong><br>
+                        Overall Level: <span id="overallLevel">-</span><br>
+                        Assessment Date: <span id="assessmentDate">-</span>
                     </div>
                 </div>
 
-                <button onclick="downloadResults()" style="margin-top: 30px;">
-                    <span id="downloadBtn">Download Results</span>
-                </button>
+                <div class="nav-buttons" style="margin-top: 30px;">
+                    <button class="secondary" onclick="showScreen('summaryScreen')">← Back to Summary</button>
+                    <button onclick="downloadPDF()">📥 Download PDF</button>
+                </div>
             </div>
         </div>
     </div>
@@ -525,143 +683,267 @@
         const translations = {
             en: {
                 welcomeTitle: "Welcome to the FLM Skills Assessment",
-                welcomeText: "This comprehensive assessment evaluates your mastery across the seven core competencies of front-line management through 21 varied scenarios.",
+                welcomeText: "This comprehensive assessment evaluates your mastery across the seven core competencies of front-line management through 21 carefully crafted scenarios.",
                 continueBtn: "Continue",
                 introTitle: "Manager Information",
                 emailLabel: "Email Address",
                 nameLabel: "Full Name",
                 segmentLabel: "Your Segment",
                 startBtn: "Start Assessment",
-                resultsTitle: "Assessment Complete",
-                downloadBtn: "Download Results",
-                advancedMsg: "You demonstrate advanced mastery across front-line management. Your strength lies in strategic thinking and execution.",
+                summaryTitle: "Assessment Complete",
+                resultsTitle: "Your FLM Skills Assessment Report",
+                advancedMsg: "You demonstrate advanced mastery across front-line management. Your strength lies in strategic thinking, disciplined execution, and developing your team.",
                 proficientMsg: "You're a proficient manager with solid execution. Continue developing in your opportunity areas to unlock advanced leadership.",
                 developingMsg: "You're building your front-line management skills. Focus on your development areas to grow into a proficient leader."
-            },
-            es: {
-                welcomeTitle: "Bienvenido a la Evaluación de Habilidades FLM",
-                welcomeText: "Esta evaluación integral mide tu dominio en las siete competencias centrales a través de 21 escenarios variados.",
-                continueBtn: "Continuar",
-                introTitle: "Información del Gerente",
-                emailLabel: "Correo Electrónico",
-                nameLabel: "Nombre Completo",
-                segmentLabel: "Tu Segmento",
-                startBtn: "Comenzar Evaluación",
-                resultsTitle: "Evaluación Completada",
-                downloadBtn: "Descargar Resultados",
-                advancedMsg: "Demuestras dominio avanzado en gestión de primera línea.",
-                proficientMsg: "Eres un gerente competente con ejecución sólida.",
-                developingMsg: "Estás desarrollando tus habilidades de gestión de primera línea."
             }
         };
 
         const questions = {
             en: [
-                { id: 1, competency: "Business Ownership", text: "When territory performance dips, what's your first move?", answers: [
-                    { text: "Jump in on deals to get deals closed", points: 5, level: "developing" },
-                    { text: "Review pipeline, forecast, rep activity, and retention together to find the pattern", points: 8, level: "proficient" },
-                    { text: "Run a territory health review: pipeline/forecast accuracy, rep ramp progress, retention trends, and forecast/actuals variance to pinpoint the root cause", points: 10, level: "advanced" }
-                ]},
-                { id: 2, competency: "Business Ownership", text: "How do you allocate your time across your four responsibility areas (People, Pipeline & Forecast, Deal Execution, Business)?", answers: [
-                    { text: "Most time goes to deal help; other areas get attention when urgent", points: 4, level: "developing" },
-                    { text: "Try to balance all four, but deal help tends to take priority under pressure", points: 7, level: "proficient" },
-                    { text: "Deliberately allocate time across all four and can articulate trade-offs when I have to choose", points: 10, level: "advanced" }
-                ]},
-                { id: 3, competency: "Business Ownership", text: "A rep struggles with retention in their accounts while closing new deals at a good rate. How do you coach them?", answers: [
-                    { text: "Tell them they need to focus on adoption and handoff protocols", points: 5, level: "developing" },
-                    { text: "Discuss how post-sale ownership affects lifetime value and ask about their adoption plan", points: 8, level: "proficient" },
-                    { text: "Map their account trajectory from close to renewal, quantify the renewal risk, coach them to own adoption, and track leading indicators", points: 10, level: "advanced" }
-                ]},
-                { id: 4, competency: "Operating Rhythm & Time Discipline", text: "How do you structure your week?", answers: [
-                    { text: "Reactive calendar — respond to what comes up", points: 4, level: "developing" },
-                    { text: "Loosely protect coaching time and admin, but it gets interrupted under pressure", points: 7, level: "proficient" },
-                    { text: "Locked calendar: coaching blocks protected, approvals consolidated, leading indicators reviewed on schedule", points: 10, level: "advanced" }
-                ]},
-                { id: 5, competency: "Operating Rhythm & Time Discipline", text: "A rep sends you a Slack message about a deal that needs approval. How do you respond?", answers: [
-                    { text: "Answer it immediately; deals come first", points: 4, level: "developing" },
-                    { text: "Try to batch approvals but sometimes break to address urgent pings", points: 6, level: "proficient" },
-                    { text: "Direct them to my consolidated approval window (e.g., 10am daily); they know when to expect a decision", points: 9, level: "advanced" }
-                ]},
-                { id: 6, competency: "Operating Rhythm & Time Discipline", text: "How often do you inspect your leading indicators (pipeline coverage, rep ramp, deal velocity)?", answers: [
-                    { text: "Ad-hoc, when something feels off", points: 4, level: "developing" },
-                    { text: "Roughly weekly, but not on a hard schedule", points: 7, level: "proficient" },
-                    { text: "Fixed cadence (e.g., every Monday) with a defined review ritual and documented trends", points: 10, level: "advanced" }
-                ]},
-                { id: 7, competency: "Coaching for Ownership", text: "A rep comes to you stuck on a deal. What do you do?", answers: [
-                    { text: "Tell them the answer or jump in to save it", points: 4, level: "developing" },
-                    { text: "Ask some coaching questions but step in if the pressure is high", points: 7, level: "proficient" },
-                    { text: "Coach through questions, hold them accountable for the next step, and trust them to own it", points: 10, level: "advanced" }
-                ]},
-                { id: 8, competency: "Coaching for Ownership", text: "One of your reps closes a deal with a weak champion. How do you handle it?", answers: [
-                    { text: "Jump in to build a secondary relationship", points: 4, level: "developing" },
-                    { text: "Coach them to build a secondary relationship but stay involved", points: 7, level: "proficient" },
-                    { text: "Coach them to own the secondary relationship, hold them accountable for the plan, and review progress without taking over", points: 10, level: "advanced" }
-                ]},
-                { id: 9, competency: "Coaching for Ownership", text: "A rep asks you to join a prospect call to 'add credibility.' What's your move?", answers: [
-                    { text: "Join and run most of the conversation to show the rep how it's done", points: 4, level: "developing" },
-                    { text: "Join but let them run it, and you add points as needed", points: 7, level: "proficient" },
-                    { text: "Ask what they need from you first; coach them to position you as a resource, not the main seller", points: 10, level: "advanced" }
-                ]},
-                { id: 10, competency: "Deal Inspection & Qualification", text: "How rigorous are you on MEDDPICC qualification?", answers: [
-                    { text: "Accept rep optimism and trust they've filled in the fields", points: 4, level: "developing" },
-                    { text: "Inspect deals and catch obvious gaps, but not consistently across the book", points: 7, level: "proficient" },
-                    { text: "Pressure-test every element for evidence, expose gaps early, and coach the rep to close them", points: 10, level: "advanced" }
-                ]},
-                { id: 11, competency: "Deal Inspection & Qualification", text: "A rep says a deal is 'in Advanced' but you have concerns about the buying committee. What do you do?", answers: [
-                    { text: "Lower the stage manually because the committee looks weak", points: 4, level: "developing" },
-                    { text: "Ask questions about the committee and suggest they build a secondary relationship", points: 7, level: "proficient" },
-                    { text: "Map the full buying committee, identify single-threaded risk, coach the rep on remediation, and hold the deal at a lower stage until risk is mitigated", points: 10, level: "advanced" }
-                ]},
-                { id: 12, competency: "Deal Inspection & Qualification", text: "How do you determine if a deal should be in Commit vs Best Case?", answers: [
-                    { text: "Rep's confidence level mostly", points: 4, level: "developing" },
-                    { text: "MEDDPICC score and expected close date", points: 7, level: "proficient" },
-                    { text: "Evidence: buying committee alignment, budget confirmed, no competing deals, legal/procurement gates identified, champion accountability", points: 10, level: "advanced" }
-                ]},
-                { id: 13, competency: "Forecast Accuracy", text: "How confident are you in your forecast?", answers: [
-                    { text: "It's a roll-up of rep feelings; surprises are common", points: 4, level: "developing" },
-                    { text: "Categories are mostly evidence-based; reasonably accurate but some slip", points: 7, level: "proficient" },
-                    { text: "Every category is defensible; forecast is accurate and stable quarter over quarter", points: 10, level: "advanced" }
-                ]},
-                { id: 14, competency: "Forecast Accuracy", text: "Three weeks before close, a deal in Commit drops. What does your process tell you?", answers: [
-                    { text: "It happens; rep misjudged", points: 4, level: "developing" },
-                    { text: "I review what went wrong but don't change the process", points: 6, level: "proficient" },
-                    { text: "I audit when Commit deals slip late, change the qualification bar if patterns emerge, and recalibrate the stage definition", points: 9, level: "advanced" }
-                ]},
-                { id: 15, competency: "Forecast Accuracy", text: "How do you defend your forecast to leadership?", answers: [
-                    { text: "I give them the numbers; they either trust me or they don't", points: 4, level: "developing" },
-                    { text: "I provide a summary of high-risk deals and reasons for shifts", points: 7, level: "proficient" },
-                    { text: "I show the underlying qualification data for every deal in Commit, variance analysis by stage, and a risk view", points: 10, level: "advanced" }
-                ]},
-                { id: 16, competency: "Retention & Expansion", text: "What's your role in post-sale growth?", answers: [
-                    { text: "Deal is done at signature; adoption and expansion happen with CS", points: 4, level: "developing" },
-                    { text: "Work with CS on adoption, but expansion is opportunistic", points: 7, level: "proficient" },
-                    { text: "Drive deliberate adoption-to-expansion motion, read whitespace early, direct rep time to highest-value growth", points: 10, level: "advanced" }
-                ]},
-                { id: 17, competency: "Retention & Expansion", text: "A customer is at high renewal risk. How involved are you?", answers: [
-                    { text: "CS owns it; if they lose it, they lose it", points: 4, level: "developing" },
-                    { text: "Work with CS and the rep to save it, but mostly CS-led", points: 7, level: "proficient" },
-                    { text: "Own the save: map the account health, identify the gap, coordinate CSM + rep effort, secure sponsor commitment", points: 10, level: "advanced" }
-                ]},
-                { id: 18, competency: "Retention & Expansion", text: "How do you identify expansion opportunities in your customer base?", answers: [
-                    { text: "Reps bring them to me when they see them", points: 4, level: "developing" },
-                    { text: "Review customer health occasionally with CS", points: 7, level: "proficient" },
-                    { text: "Run account plans on top accounts, analyze usage/adoption trends, map org chart for net-new departments, direct rep time", points: 10, level: "advanced" }
-                ]},
-                { id: 19, competency: "Business & Financial Acumen", text: "How do you connect team activity to company financials?", answers: [
-                    { text: "Not much; rigor feels like process, not business impact", points: 4, level: "developing" },
-                    { text: "Understand headline metrics and use some tools", points: 7, level: "proficient" },
-                    { text: "Connect daily behavior to ARR, frame the why for reps, use AI to buy back real time", points: 10, level: "advanced" }
-                ]},
-                { id: 20, competency: "Business & Financial Acumen", text: "A rep is working deals with long sales cycles and small deal sizes. How do you coach them on the tradeoff?", answers: [
-                    { text: "Tell them to focus on bigger deals", points: 4, level: "developing" },
-                    { text: "Discuss how deal size and cycle time affect quota and ARR", points: 7, level: "proficient" },
-                    { text: "Map their pipeline and show the IRR, calculate opportunity cost, coach them to balance pipeline mix for predictability", points: 10, level: "advanced" }
-                ]},
-                { id: 21, competency: "Business & Financial Acumen", text: "How do you use data and tools to scale your team's output?", answers: [
-                    { text: "Mostly manual reviews and gut feel", points: 4, level: "developing" },
-                    { text: "Use sales tools for visibility; some automation", points: 7, level: "proficient" },
-                    { text: "Leverage AI for forecast, predictive churn scoring, account health automation, and rep coaching", points: 10, level: "advanced" }
-                ]}
+                // BUSINESS OWNERSHIP (Q1-3)
+                {
+                    id: 1,
+                    competency: "Business Ownership",
+                    text: "When territory performance dips, what's your first move?",
+                    answers: [
+                        { text: "Jump in on deals to get some closes", points: 4, level: "developing" },
+                        { text: "Ask corporate for additional resources to help the team", points: 2, level: "trap" },
+                        { text: "Review pipeline, forecast, rep activity, and retention together to find the pattern", points: 8, level: "proficient" },
+                        { text: "Run a territory health review: pipeline/forecast accuracy, rep ramp progress, retention trends, and forecast/actuals variance to pinpoint the root cause", points: 10, level: "advanced" }
+                    ]
+                },
+                {
+                    id: 2,
+                    competency: "Business Ownership",
+                    text: "How do you allocate your time across your four responsibility areas (People, Pipeline & Forecast, Deal Execution, Business)?",
+                    answers: [
+                        { text: "Delegate most work to your lead rep or assistant", points: 2, level: "trap" },
+                        { text: "Most time goes to deal help; other areas get attention when urgent", points: 4, level: "developing" },
+                        { text: "Try to balance all four, but deal help tends to take priority under pressure", points: 7, level: "proficient" },
+                        { text: "Deliberately allocate time across all four and can articulate trade-offs when I have to choose", points: 10, level: "advanced" }
+                    ]
+                },
+                {
+                    id: 3,
+                    competency: "Business Ownership",
+                    text: "A rep struggles with retention in their accounts while closing new deals at a good rate. How do you coach them?",
+                    answers: [
+                        { text: "Have them work directly with your Customer Success team instead", points: 2, level: "trap" },
+                        { text: "Tell them they need to focus on adoption and handoff protocols", points: 5, level: "developing" },
+                        { text: "Discuss how post-sale ownership affects lifetime value and ask about their adoption plan", points: 8, level: "proficient" },
+                        { text: "Map their account trajectory from close to renewal, quantify the renewal risk, coach them to own adoption, and track leading indicators", points: 10, level: "advanced" }
+                    ]
+                },
+
+                // OPERATING RHYTHM & TIME DISCIPLINE (Q4-6)
+                {
+                    id: 4,
+                    competency: "Operating Rhythm & Time Discipline",
+                    text: "How do you structure your week?",
+                    answers: [
+                        { text: "Schedule everything but rarely protect the time you block", points: 2, level: "trap" },
+                        { text: "Reactive calendar — respond to what comes up", points: 4, level: "developing" },
+                        { text: "Loosely protect coaching time and admin, but it gets interrupted under pressure", points: 7, level: "proficient" },
+                        { text: "Locked calendar: coaching blocks protected, approvals consolidated, leading indicators reviewed on schedule", points: 10, level: "advanced" }
+                    ]
+                },
+                {
+                    id: 5,
+                    competency: "Operating Rhythm & Time Discipline",
+                    text: "A rep sends you a Slack message about a deal that needs approval. How do you respond?",
+                    answers: [
+                        { text: "Delegate approvals to your lead rep to scale yourself", points: 2, level: "trap" },
+                        { text: "Answer it immediately; deals come first", points: 4, level: "developing" },
+                        { text: "Try to batch approvals but sometimes break to address urgent pings", points: 6, level: "proficient" },
+                        { text: "Direct them to my consolidated approval window (e.g., 10am daily); they know when to expect a decision", points: 9, level: "advanced" }
+                    ]
+                },
+                {
+                    id: 6,
+                    competency: "Operating Rhythm & Time Discipline",
+                    text: "How often do you inspect your leading indicators (pipeline coverage, rep ramp, deal velocity)?",
+                    answers: [
+                        { text: "Only check them at the end of the quarter when numbers really matter", points: 2, level: "trap" },
+                        { text: "Ad-hoc, when something feels off", points: 4, level: "developing" },
+                        { text: "Roughly weekly, but not on a hard schedule", points: 7, level: "proficient" },
+                        { text: "Fixed cadence (e.g., every Monday) with a defined review ritual and documented trends", points: 10, level: "advanced" }
+                    ]
+                },
+
+                // COACHING FOR OWNERSHIP (Q7-9)
+                {
+                    id: 7,
+                    competency: "Coaching for Ownership",
+                    text: "A rep comes to you stuck on a deal. What do you do?",
+                    answers: [
+                        { text: "Assign them to work with a peer mentor instead of coaching them directly", points: 2, level: "trap" },
+                        { text: "Tell them the answer or jump in to save it", points: 4, level: "developing" },
+                        { text: "Ask some coaching questions but step in if the pressure is high", points: 7, level: "proficient" },
+                        { text: "Coach through questions, hold them accountable for the next step, and trust them to own it", points: 10, level: "advanced" }
+                    ]
+                },
+                {
+                    id: 8,
+                    competency: "Coaching for Ownership",
+                    text: "One of your reps closes a deal with a weak champion. How do you handle it?",
+                    answers: [
+                        { text: "Bring in an executive sponsor to build the relationship for them", points: 2, level: "trap" },
+                        { text: "Jump in to build a secondary relationship", points: 4, level: "developing" },
+                        { text: "Coach them to build a secondary relationship but stay involved", points: 7, level: "proficient" },
+                        { text: "Coach them to own the secondary relationship, hold them accountable for the plan, and review progress without taking over", points: 10, level: "advanced" }
+                    ]
+                },
+                {
+                    id: 9,
+                    competency: "Coaching for Ownership",
+                    text: "A rep asks you to join a prospect call to 'add credibility.' What's your move?",
+                    answers: [
+                        { text: "Take the call from your office instead so you're not distracted from other work", points: 2, level: "trap" },
+                        { text: "Join and run most of the conversation to show the rep how it's done", points: 4, level: "developing" },
+                        { text: "Join but let them run it, and you add points as needed", points: 7, level: "proficient" },
+                        { text: "Ask what they need from you first; coach them to position you as a resource, not the main seller. You join briefly for credibility only.", points: 10, level: "advanced" }
+                    ]
+                },
+
+                // DEAL INSPECTION & QUALIFICATION (Q10-12)
+                {
+                    id: 10,
+                    competency: "Deal Inspection & Qualification",
+                    text: "How rigorous are you on MEDDPICC qualification?",
+                    answers: [
+                        { text: "Use a MEDDPICC checklist template but don't verify the rep's answers", points: 2, level: "trap" },
+                        { text: "Accept rep optimism and trust they've filled in the fields", points: 4, level: "developing" },
+                        { text: "Inspect deals and catch obvious gaps, but not consistently across the book", points: 7, level: "proficient" },
+                        { text: "Pressure-test every element for evidence, expose gaps early, and coach the rep to close them", points: 10, level: "advanced" }
+                    ]
+                },
+                {
+                    id: 11,
+                    competency: "Deal Inspection & Qualification",
+                    text: "A rep says a deal is 'in Advanced' but you have concerns about the buying committee. What do you do?",
+                    answers: [
+                        { text: "Have your Customer Success team build the secondary relationship post-close", points: 2, level: "trap" },
+                        { text: "Lower the stage manually because the committee looks weak", points: 4, level: "developing" },
+                        { text: "Ask questions about the committee and suggest they build a secondary relationship", points: 7, level: "proficient" },
+                        { text: "Map the full buying committee (roles, approval gates, timelines), identify single-threaded risk, coach the rep on remediation, and hold the deal at a lower stage until risk is mitigated", points: 10, level: "advanced" }
+                    ]
+                },
+                {
+                    id: 12,
+                    competency: "Deal Inspection & Qualification",
+                    text: "How do you determine if a deal should be in Commit vs Best Case?",
+                    answers: [
+                        { text: "Use deal size as the main criteria — larger deals go in Commit", points: 2, level: "trap" },
+                        { text: "Rep's confidence level mostly", points: 4, level: "developing" },
+                        { text: "MEDDPICC score and expected close date", points: 7, level: "proficient" },
+                        { text: "Evidence: buying committee alignment, budget confirmed, no competing deals, legal/procurement gates identified, champion accountability, and sponsor validation documented", points: 10, level: "advanced" }
+                    ]
+                },
+
+                // FORECAST ACCURACY (Q13-15)
+                {
+                    id: 13,
+                    competency: "Forecast Accuracy",
+                    text: "How confident are you in your forecast?",
+                    answers: [
+                        { text: "Use your historical win rate to predict what will close", points: 2, level: "trap" },
+                        { text: "It's a roll-up of rep feelings; surprises are common", points: 4, level: "developing" },
+                        { text: "Categories are mostly evidence-based; reasonably accurate but some slip", points: 7, level: "proficient" },
+                        { text: "Every category is defensible; forecast is accurate and stable quarter over quarter", points: 10, level: "advanced" }
+                    ]
+                },
+                {
+                    id: 14,
+                    competency: "Forecast Accuracy",
+                    text: "Three weeks before close, a deal in Commit drops. What does your process tell you?",
+                    answers: [
+                        { text: "Lower all Commit deals by 10% automatically to account for slips", points: 2, level: "trap" },
+                        { text: "It happens; rep misjudged", points: 4, level: "developing" },
+                        { text: "I review what went wrong but don't change the process", points: 6, level: "proficient" },
+                        { text: "I audit when Commit deals slip late, change the qualification bar if patterns emerge, and recalibrate the stage definition", points: 9, level: "advanced" }
+                    ]
+                },
+                {
+                    id: 15,
+                    competency: "Forecast Accuracy",
+                    text: "How do you defend your forecast to leadership?",
+                    answers: [
+                        { text: "Show competitive win/loss data to explain variances", points: 2, level: "trap" },
+                        { text: "I give them the numbers; they either trust me or they don't", points: 4, level: "developing" },
+                        { text: "I provide a summary of high-risk deals and reasons for shifts", points: 7, level: "proficient" },
+                        { text: "I show the underlying qualification data for every deal in Commit, variance analysis by stage, and a risk view of what could slip", points: 10, level: "advanced" }
+                    ]
+                },
+
+                // RETENTION & EXPANSION (Q16-18)
+                {
+                    id: 16,
+                    competency: "Retention & Expansion",
+                    text: "What's your role in post-sale growth?",
+                    answers: [
+                        { text: "Focus your reps on new logo deals instead of expansion to hit quota", points: 2, level: "trap" },
+                        { text: "Deal is done at signature; adoption and expansion happen with CS", points: 4, level: "developing" },
+                        { text: "Work with CS on adoption, but expansion is opportunistic", points: 7, level: "proficient" },
+                        { text: "Drive deliberate adoption-to-expansion motion, read whitespace early, direct rep time to highest-value growth", points: 10, level: "advanced" }
+                    ]
+                },
+                {
+                    id: 17,
+                    competency: "Retention & Expansion",
+                    text: "A customer is at high renewal risk. How involved are you?",
+                    answers: [
+                        { text: "Offer the customer a significant discount to keep them", points: 2, level: "trap" },
+                        { text: "CS owns it; if they lose it, they lose it", points: 4, level: "developing" },
+                        { text: "Work with CS and the rep to save it, but mostly CS-led", points: 7, level: "proficient" },
+                        { text: "Own the save: map the account health, identify the gap, coordinate CSM + rep effort, secure sponsor commitment to close the gap", points: 10, level: "advanced" }
+                    ]
+                },
+                {
+                    id: 18,
+                    competency: "Retention & Expansion",
+                    text: "How do you identify expansion opportunities in your customer base?",
+                    answers: [
+                        { text: "Use propensity models to auto-identify expansion targets without reps knowing why", points: 2, level: "trap" },
+                        { text: "Reps bring them to me when they see them", points: 4, level: "developing" },
+                        { text: "Review customer health occasionally with CS", points: 7, level: "proficient" },
+                        { text: "Run account plans on top accounts, analyze usage/adoption trends, map org chart for net-new departments, and direct rep time to highest-value expansion plays", points: 10, level: "advanced" }
+                    ]
+                },
+
+                // BUSINESS & FINANCIAL ACUMEN (Q19-21)
+                {
+                    id: 19,
+                    competency: "Business & Financial Acumen",
+                    text: "How do you connect team activity to company financials?",
+                    answers: [
+                        { text: "Focus your reps on activity metrics (calls/meetings) above all else", points: 2, level: "trap" },
+                        { text: "Not much; rigor feels like process, not business impact", points: 4, level: "developing" },
+                        { text: "Understand headline metrics and use some tools", points: 7, level: "proficient" },
+                        { text: "Connect daily behavior to ARR, frame the why for reps, use AI to buy back real time", points: 10, level: "advanced" }
+                    ]
+                },
+                {
+                    id: 20,
+                    competency: "Business & Financial Acumen",
+                    text: "A rep is working deals with long sales cycles and small deal sizes. How do you coach them on the tradeoff?",
+                    answers: [
+                        { text: "Have them work on larger accounts in parallel to stay busy", points: 2, level: "trap" },
+                        { text: "Tell them to focus on bigger deals", points: 4, level: "developing" },
+                        { text: "Discuss how deal size and cycle time affect quota and ARR", points: 7, level: "proficient" },
+                        { text: "Map their pipeline and show them the IRR (time invested vs payoff), calculate the opportunity cost of longer cycles, and coach them to balance pipeline mix for predictability", points: 10, level: "advanced" }
+                    ]
+                },
+                {
+                    id: 21,
+                    competency: "Business & Financial Acumen",
+                    text: "How do you use data and tools to scale your team's output?",
+                    answers: [
+                        { text: "Hire more people to increase team capacity", points: 2, level: "trap" },
+                        { text: "Mostly manual reviews and gut feel", points: 4, level: "developing" },
+                        { text: "Use sales tools for visibility; some automation", points: 7, level: "proficient" },
+                        { text: "Leverage AI for forecast, predictive churn scoring, account health automation, and rep coaching to multiply my effectiveness", points: 10, level: "advanced" }
+                    ]
+                }
             ]
         };
 
@@ -669,27 +951,13 @@
         let currentQuestion = 0;
         let answers = {};
         let managerData = { email: '', name: '', segment: '' };
+        let assessmentResults = {};
 
         function setLanguage(lang) {
             currentLanguage = lang;
             document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-            updateTranslations();
             setTimeout(() => showScreen('welcomeScreen'), 200);
-        }
-
-        function updateTranslations() {
-            const t = translations[currentLanguage];
-            document.getElementById('welcomeTitle').textContent = t.welcomeTitle;
-            document.getElementById('welcomeText').textContent = t.welcomeText;
-            document.getElementById('continueBtn').textContent = t.continueBtn;
-            document.getElementById('introTitle').textContent = t.introTitle;
-            document.getElementById('emailLabel').textContent = t.emailLabel;
-            document.getElementById('nameLabel').textContent = t.nameLabel;
-            document.getElementById('segmentLabel').textContent = t.segmentLabel;
-            document.getElementById('startBtn').textContent = t.startBtn;
-            document.getElementById('resultsTitle').textContent = t.resultsTitle;
-            document.getElementById('downloadBtn').textContent = t.downloadBtn;
         }
 
         function showScreen(screenId) {
@@ -775,12 +1043,12 @@
         function submitAssessment() {
             const competencyScores = {};
             const competencies = [
-                'Business Ownership', 
-                'Operating Rhythm & Time Discipline', 
-                'Coaching for Ownership', 
-                'Deal Inspection & Qualification', 
-                'Forecast Accuracy', 
-                'Retention & Expansion', 
+                'Business Ownership',
+                'Operating Rhythm & Time Discipline',
+                'Coaching for Ownership',
+                'Deal Inspection & Qualification',
+                'Forecast Accuracy',
+                'Retention & Expansion',
                 'Business & Financial Acumen'
             ];
 
@@ -814,26 +1082,59 @@
                 totalPoints += competencyScores[comp].total;
             });
 
-            const avgScore = Math.round(totalPoints / 7 / 3);
             let overallLevel = 'developing';
             if (advancedCount >= 5) overallLevel = 'advanced';
             else if (advancedCount >= 3 || (advancedCount >= 2 && developingCount === 0)) overallLevel = 'proficient';
 
-            showResults(competencyScores, overallLevel);
+            assessmentResults = {
+                competencyScores,
+                overallLevel,
+                totalPoints,
+                advancedCount,
+                developingCount
+            };
+
+            showSummary();
             saveToAirtable(competencyScores, overallLevel, totalPoints);
         }
 
-        function showResults(competencyScores, overallLevel) {
+        function showSummary() {
             const t = translations[currentLanguage];
+            const { overallLevel, competencyScores, advancedCount, developingCount, totalPoints } = assessmentResults;
             const levelClass = overallLevel.toLowerCase();
+
             let msg = t.developingMsg;
             if (overallLevel === 'advanced') msg = t.advancedMsg;
             else if (overallLevel === 'proficient') msg = t.proficientMsg;
 
-            document.getElementById('profileLevel').textContent = overallLevel.charAt(0).toUpperCase() + overallLevel.slice(1) + ' Manager';
-            document.getElementById('profileLevel').className = 'profile-level ' + levelClass;
-            document.getElementById('coachingMessage').textContent = msg;
+            document.getElementById('summaryBadge').textContent = overallLevel[0].toUpperCase();
+            document.getElementById('summaryBadge').className = 'summary-badge ' + levelClass;
+            document.getElementById('summaryProfileTitle').textContent = overallLevel.charAt(0).toUpperCase() + overallLevel.slice(1) + ' Manager';
+            document.getElementById('summaryDescription').textContent = msg;
 
+            // Key insights
+            const strengths = Object.keys(competencyScores).filter(c => competencyScores[c].level === 'advanced');
+            const opportunities = Object.keys(competencyScores).filter(c => competencyScores[c].level === 'developing');
+
+            let insights = `
+                <li><strong>${advancedCount} strength area${advancedCount !== 1 ? 's' : ''}:</strong> ${advancedCount > 0 ? strengths.slice(0, 2).join(', ') : 'Developing all competencies'}</li>
+                <li><strong>${developingCount} development area${developingCount !== 1 ? 's' : ''}:</strong> ${developingCount > 0 ? opportunities.slice(0, 2).join(', ') : 'Excellent! No significant gaps'}</li>
+            `;
+
+            document.getElementById('keyInsightsList').innerHTML = insights;
+            showScreen('summaryScreen');
+        }
+
+        function viewFullReport() {
+            const { competencyScores, overallLevel, totalPoints } = assessmentResults;
+            const t = translations[currentLanguage];
+            const levelClass = overallLevel.toLowerCase();
+
+            let msg = t.developingMsg;
+            if (overallLevel === 'advanced') msg = t.advancedMsg;
+            else if (overallLevel === 'proficient') msg = t.proficientMsg;
+
+            // Competencies
             let competenciesHtml = '';
             Object.keys(competencyScores).forEach(comp => {
                 const score = competencyScores[comp];
@@ -846,21 +1147,64 @@
             });
             document.getElementById('competenciesList').innerHTML = competenciesHtml;
 
+            // Profile
+            document.getElementById('profileLevel').textContent = overallLevel.charAt(0).toUpperCase() + overallLevel.slice(1) + ' Manager';
+            document.getElementById('profileLevel').className = 'profile-level ' + levelClass;
+            document.getElementById('coachingMessage').textContent = msg;
+
+            // Strengths & Opportunities
             const strengths = Object.keys(competencyScores).filter(c => competencyScores[c].level === 'advanced');
             const opportunities = Object.keys(competencyScores).filter(c => competencyScores[c].level === 'developing');
 
-            const strengthsList = strengths.length > 0 
-                ? '<ul>' + strengths.map(s => '<li>' + s + '</li>').join('') + '</ul>'
+            const strengthsList = strengths.length > 0
+                ? '<ul>' + strengths.map(s => `<li>${s}</li>`).join('') + '</ul>'
                 : '<p>Continue developing to identify strength areas.</p>';
 
-            const opportunitiesList = opportunities.length > 0 
-                ? '<ul>' + opportunities.map(o => '<li>' + o + '</li>').join('') + '</ul>'
+            const opportunitiesList = opportunities.length > 0
+                ? '<ul>' + opportunities.map(o => `<li>${o}</li>`).join('') + '</ul>'
                 : '<p>Excellent! You have no significant development gaps.</p>';
 
             document.getElementById('strengthsList').innerHTML = strengthsList;
             document.getElementById('opportunitiesList').innerHTML = opportunitiesList;
 
+            // Score breakdown - just show date and level
+            document.getElementById('rawScore').textContent = totalPoints;
+            document.getElementById('overallLevel').textContent = overallLevel.charAt(0).toUpperCase() + overallLevel.slice(1);
+            document.getElementById('assessmentDate').textContent = new Date().toLocaleDateString();
+
             showScreen('resultsScreen');
+        }
+
+        function downloadPDF() {
+            const { competencyScores, overallLevel, totalPoints } = assessmentResults;
+            const element = document.getElementById('reportContent');
+
+            // Create a clean copy for PDF
+            const pdfContent = element.cloneNode(true);
+            
+            // Add header
+            const header = document.createElement('div');
+            header.className = 'pdf-header';
+            header.innerHTML = `
+                <h1>FLM Skills Assessment Report</h1>
+                <p>${managerData.name}</p>
+                <div class="pdf-metadata">
+                    <strong>Email:</strong> ${managerData.email}<br>
+                    <strong>Segment:</strong> ${managerData.segment}<br>
+                    <strong>Assessment Date:</strong> ${new Date().toLocaleDateString()}
+                </div>
+            `;
+            pdfContent.insertBefore(header, pdfContent.firstChild);
+
+            const opt = {
+                margin: 15,
+                filename: `FLM-Assessment-${managerData.name.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+            };
+
+            html2pdf().set(opt).from(pdfContent).save();
         }
 
         function saveToAirtable(competencyScores, overallLevel, totalPoints) {
@@ -894,20 +1238,6 @@
                 body: JSON.stringify(record)
             }).catch(err => console.error('Error saving to Airtable:', err));
         }
-
-        function downloadResults() {
-            const element = document.getElementById('resultsScreen').querySelector('.card');
-            const opt = {
-                margin: 10,
-                filename: `FLM-Assessment-${managerData.name.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-            };
-            html2pdf().set(opt).from(element).save();
-        }
-
-        updateTranslations();
     </script>
 </body>
 </html>
