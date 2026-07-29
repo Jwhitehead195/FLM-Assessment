@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLM Skills Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1B1D1E 0%, #2a2d31 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .card {
+            background: #FBFBF9;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 12px;
+            color: #1B1D1E;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .btn-card {
+            padding: 30px;
+            border-radius: 8px;
+            border: 2px solid #ECEBE6;
+            background: white;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-card:hover {
+            border-color: #3A34C4;
+            box-shadow: 0 4px 12px rgba(58, 52, 196, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .btn-icon {
+            font-size: 32px;
+        }
+
+        .btn-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1B1D1E;
+        }
+
+        .btn-desc {
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+        }
+
+        .info {
+            background: #f0f5f0;
+            border-left: 4px solid #157F4B;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 13px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .info strong {
+            color: #157F4B;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🎯 FLM Skills Assessment</h1>
+            <p class="subtitle">Front-Line Manager Competency Evaluation</p>
+
+            <div class="button-grid">
+                <a href="./FLM-assessment-competency.html" class="btn-card">
+                    <div class="btn-icon">📝</div>
+                    <div class="btn-title">Take Assessment</div>
+                    <div class="btn-desc">Complete the 21-question competency evaluation</div>
+                </a>
+
+                <a href="./flm-dashboard-competency.html" class="btn-card">
+                    <div class="btn-icon">📊</div>
+                    <div class="btn-title">View Dashboard</div>
+                    <div class="btn-desc">Review team results and insights</div>
+                </a>
+            </div>
+
+            <div class="info">
+                <strong>ℹ️ About This Assessment:</strong><br>
+                This competency-based assessment evaluates your mastery across 7 core FLM competencies: Business Ownership, Operating Rhythm, Coaching for Ownership, Deal Inspection, Forecast Accuracy, Retention & Expansion, and Business Acumen.<br><br>
+                <strong>Duration:</strong> ~15-20 minutes<br>
+                <strong>Language Support:</strong> English, Spanish, Portuguese, Japanese
+            </div>
+        </div>
+    </div>
+</body>
+</html>
